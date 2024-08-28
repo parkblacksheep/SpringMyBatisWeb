@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.kosta.batis.dao.BoardMapper">
+   <!--게시글 조회 SQL   -->
+   <!--
+    SELECT bno, title, content, writer, view_cnt, reg_date, up_date
+	FROM springbasic.board
+	where bno= 1;
+	
+	
+	INSERT INTO springbasic.board
+	(bno, title, content, writer, view_cnt, reg_date, up_date)
+	VALUES(0, '', '', '', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+	-->
+	
+	<sql id = "selectFromBoard">
+		SELECT bno, title, content, writer, view_cnt, reg_date, up_date
+		FROM board
+	</sql>
+	
+	<select id="select" parameterType="int" resultType="BoardDTO">
+		<include refid="selectFromBoard"></include>
+		where	bno=#{bno}
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(*) from board
+	</select>
+	
+	<select id="selectPage" parameterType="map" resultType="BoardDTO">
+		<include refid="selectFromBoard"></include>
+		order by reg_date desc, bno desc
+		limit #{pageSize} offset #{offset}
+	</select>
+	
+	<delete id="deleteAll">
+		delete FROM board
+	</delete>
+	
+	<delete id="delete" parameterType="map">
+		delete from board 
+		where bno =#{bno} and writer =#{writer}
+	</delete>
+	
+	<delete id="deleteForAdmin">
+		delete from board where bno =#{bno}
+	</delete>
+	
+	<insert id="insert" parameterType="BoardDTO" >
+		INSERT INTO board
+		( title, content, writer)
+		VALUES(#{title},#{content},#{writer});
+	</insert>
+	
+	<update id="update" parameterType="BoardDTO">
+		UPDATE board
+		SET title=#{title}, content=#{content}, up_date= now()
+		WHERE bno=#{bno} and writer=#{writer};
+	</update>
+	
+	<update id="increaseViewCnt" parameterType="int" >
+		Update board
+		set view_cnt=view_cnt+1
+		where bno=#{bno}
+	</update>
+  </mapper>
